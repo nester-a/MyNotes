@@ -8,4 +8,8 @@ namespace MyNotes.Domain.Base
     {
 
     }
+    public interface IUser : IUser<int>, INamedEntity
+    {
+
+    }
 }
