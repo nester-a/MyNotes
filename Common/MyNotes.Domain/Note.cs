@@ -21,4 +21,6 @@ namespace MyNotes.Domain
         public DateTime CreationTime { get; } = DateTime.Now;
 
     }
+    /// <summary>Сущность записи</summary>
+    public class Note : Note<int>, INote { }
 }
