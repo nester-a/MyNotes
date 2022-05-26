@@ -45,13 +45,6 @@ namespace MyNotes.Interfaces.Base.Repositories
         /// <returns>Перечисление полученных из репозитория сущностей</returns>
         Task<IEnumerable<T>> Get(int Skip, int Count, CancellationToken Cancel = default);
 
-        /// <summary>Получить страницу с сущностями из репозитория</summary>
-        /// <param name="PageNumber">Номер страницы начиная с нуля</param>
-        /// <param name="PageSize">Размер страницы</param>
-        /// <param name="Cancel">Признак отмены асинхронной операции</param>
-        /// <returns>Страница с сущностями из репозитория</returns>
-        Task<IPage<T>> GetPage(int PageNumber, int PageSize, CancellationToken Cancel = default);
-
         /// <summary>Получить сущность по указанному идентификатору</summary>
         /// <param name="Id">Идентификатор извлекаемой сущности</param>
         /// <param name="Cancel">Признак отмены асинхронной операции</param>
