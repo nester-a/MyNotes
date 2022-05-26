@@ -17,7 +17,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyNotes.Domain.Base", "Comm
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyNotes.Domain", "Common\MyNotes.Domain\MyNotes.Domain.csproj", "{A8A0CD6B-C657-4F54-8A8F-C6835B407023}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyNotes.Interfaces.Nase", "Services\MyNotes.Interfaces.Nase\MyNotes.Interfaces.Nase.csproj", "{6F9C2214-9F15-479C-8E3F-7245472AE753}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyNotes.Interfaces.Base", "Services\MyNotes.Interfaces.Nase\MyNotes.Interfaces.Base.csproj", "{6F9C2214-9F15-479C-8E3F-7245472AE753}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
