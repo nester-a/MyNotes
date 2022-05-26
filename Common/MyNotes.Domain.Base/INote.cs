@@ -18,4 +18,5 @@ namespace MyNotes.Domain.Base
         /// <summary>Время создания</summary>
         DateTime CreationTime { get; }
     }
+    public interface INote : INote<int>, IEntity { }
 }
