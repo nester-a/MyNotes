@@ -59,4 +59,8 @@ namespace MyNotes.Interfaces.Services
             throw new ArgumentException($"Repository doesn't contain entity with this{id}");
         }
     }
+    public abstract class Service<T> : Service<T, int> where T : Entity<int>
+    {
+        protected Service(IRepository<T, int> repository) : base(repository) { }
+    }
 }
