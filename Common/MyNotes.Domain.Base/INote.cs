@@ -3,8 +3,7 @@
 namespace MyNotes.Domain.Base
 {
     /// <summary>Сущность записи</summary>
-    /// <typeparam name="TKey">Тип первичного ключа</typeparam>
-    public interface INote<TKey> : IEntity<TKey>
+    public interface INote
     {
         /// <summary>Заголовок</summary>
         string Title { get; set; }
@@ -13,7 +12,7 @@ namespace MyNotes.Domain.Base
         string Body { get; set; }
 
         /// <summary>Автор</summary>
-        IUser<TKey> Author { get; set; }
+        IUser Author { get; set; }
 
         /// <summary>Время создания</summary>
         DateTime CreationTime { get; }
