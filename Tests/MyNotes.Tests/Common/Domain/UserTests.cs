@@ -5,7 +5,7 @@ using MyNotes.Domain.Base.Enitities;
 using MyNotes.Domain.Entities;
 using Assert = Xunit.Assert;
 
-namespace MyNotes.Tests.Common
+namespace MyNotes.Tests.Common.Domain
 {
     [TestClass]
     public class UserTests
