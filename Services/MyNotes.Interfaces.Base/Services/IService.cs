@@ -32,4 +32,8 @@ namespace MyNotes.Interfaces.Base.Services
         /// <returns>Удалённая сущность</returns>
         T Delete(TKey id);
     }
+
+    /// <summary>Сервис сущностей</summary>
+    /// <typeparam name="T">Тип сущности, с которой работает сервис</typeparam>
+    public interface IService<T> : IService<T, int> where T : IEntity<int> { }
 }
