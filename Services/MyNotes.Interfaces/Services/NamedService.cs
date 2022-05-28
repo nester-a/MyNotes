@@ -48,4 +48,8 @@ namespace MyNotes.Interfaces.Services
             throw new ArgumentException($"Repository doesn't contain any entity with this {name}");
         }
     }
+    public abstract class NamedService<T> : NamedService<T, int> where T : NamedEntity<int>
+    {
+        protected NamedService(INamedRepository<T, int> repository) : base(repository) { }
+    }
 }
