@@ -17,13 +17,13 @@ namespace MyNotes.Interfaces.Base.Repositories
         /// <param name="Name">Имя сущности, которую требуется получить из репозитория</param>
         /// <param name="Cancel">Признак отмены асинхронной операции</param>
         /// <returns>Сущность с указанным именем в случае её наличия, и null, если сущности с заданным именем в репозитории нет</returns>
-        Task<T> GetByName(string Name, CancellationToken Cancel = default);
+        Task<IEnumerable<T>> GetByName(string Name, CancellationToken Cancel = default);
 
         /// <summary>Удаление сущности с указанным именем из репозитория</summary>
         /// <param name="Name">Имя удаляемой сущности</param>
         /// <param name="Cancel">Признак отмены асинхронной операции</param>
         /// <returns>Удалённая из репозитория сущность в случае её наличия и null, если такой сущности в репозитории не было</returns>
-        Task<T> DeleteByName(string Name, CancellationToken Cancel = default);
+        Task<IEnumerable<T>> DeleteByName(string Name, CancellationToken Cancel = default);
     }
 
     /// <summary>Репозиторий именованных сущностей</summary>
