@@ -1,7 +1,6 @@
 ﻿using MyNotes.Domain.Base;
-using MyNotes.Interfaces.Base.Repositories;
 
-namespace MyNotes.Interfaces.Base
+namespace MyNotes.Interfaces.Base.Repositories
 {
     public interface INoteRepository<T, in TKey> : IRepository<T, TKey> where T : INote<TKey>
     {

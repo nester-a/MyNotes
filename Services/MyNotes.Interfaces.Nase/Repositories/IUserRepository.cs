@@ -1,7 +1,6 @@
 ﻿using MyNotes.Domain.Base;
-using MyNotes.Interfaces.Base.Repositories;
 
-namespace MyNotes.Interfaces.Base
+namespace MyNotes.Interfaces.Base.Repositories
 {
     /// <summary>Репозиторий сущностей пользователя</summary>
     /// <typeparam name="T">Тип сущности</typeparam>
