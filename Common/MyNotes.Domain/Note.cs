@@ -15,7 +15,7 @@ namespace MyNotes.Domain
 
         /// <summary>Автор</summary>
         /// <typeparam name="TKey">Тип первичного ключа</typeparam>
-        public IUser<TKey> Author { get; set; }
+        public IUser Author { get; set; }
 
         /// <summary>Время создания</summary>
         public DateTime CreationTime { get; } = DateTime.Now;

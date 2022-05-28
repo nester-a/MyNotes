@@ -13,7 +13,7 @@ namespace MyNotes.Domain.Base
         string Body { get; set; }
 
         /// <summary>Автор</summary>
-        IUser<TKey> Author { get; set; }
+        IUser Author { get; set; }
 
         /// <summary>Время создания</summary>
         DateTime CreationTime { get; }
