@@ -6,55 +6,55 @@ namespace MyNotes.Interfaces.Services
 {
     public abstract class Service<T, TKey> : IService<T, TKey> where T : Entity<TKey> where TKey : IEquatable<TKey>
     {
-        protected IRepository<T, TKey> _Repository { get; private set; }
+        private IRepository<T, TKey> _repository;
 
         protected Service(IRepository<T, TKey> repository)
         {
-            _Repository = repository;
+            _repository = repository;
         }
 
 
         public T Create(T newEntity)
         {
-            var result = _Repository.Exist(newEntity).Result;
+            var result = _repository.Exist(newEntity).Result;
             if (result)
             {
                 throw new ArgumentException($"Repository already contains entity {nameof(newEntity)}");
             }
-            return _Repository.Add(newEntity).Result;
+            return _repository.Add(newEntity).Result;
         }
 
         public T Delete(TKey id)
         {
-            var result = _Repository.ExistId(id).Result;
+            var result = _repository.ExistId(id).Result;
             if (result)
             {
-                return _Repository.DeleteById(id).Result;
+                return _repository.DeleteById(id).Result;
             }
             throw new ArgumentException($"Repository doesn't contain entity with this{id}");
         }
 
         public ICollection<T> GetAll()
         {
-            return _Repository.GetAll().Result.ToList();
+            return _repository.GetAll().Result.ToList();
         }
 
         public T GetById(TKey id)
         {
-            var result = _Repository.ExistId(id).Result;
+            var result = _repository.ExistId(id).Result;
             if (result)
             {
-                return _Repository.GetById(id).Result;
+                return _repository.GetById(id).Result;
             }
             throw new ArgumentException($"Repository doesn't contain entity with this{id}");
         }
 
         public T Update(TKey id, T entityForUpdate)
         {
-            var result = _Repository.ExistId(id).Result;
+            var result = _repository.ExistId(id).Result;
             if (result)
             {
-                return _Repository.Update(entityForUpdate).Result;
+                return _repository.Update(entityForUpdate).Result;
             }
             throw new ArgumentException($"Repository doesn't contain entity with this{id}");
         }
