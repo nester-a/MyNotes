@@ -1,8 +1,9 @@
 ﻿using MyNotes.Domain.Base;
+using MyNotes.Domain.Base.Enitities;
 
 namespace MyNotes.Interfaces.Base.Repositories
 {
-    public interface INoteRepository<T> where T : INote
+    public interface INoteRepository<T, in TKey> : IRepository<T, TKey> where T : IEntity<TKey>, INote
     {
         /// <summary>Проверка - существует ли в репозитории запись с указанным заголовком</summary>
         /// <param name="Title">Заголовок записи</param>
@@ -14,13 +15,13 @@ namespace MyNotes.Interfaces.Base.Repositories
         /// <param name="Title">Заголовок записи, которую требуется получить из репозитория</param>
         /// <param name="Cancel">Признак отмены асинхронной операции</param>
         /// <returns>Запись с указанным заголовком в случае её наличия, и null, если записи с заданным заголовком в репозитории нет</returns>
-        Task<T> GetByTitle(string Title, CancellationToken Cancel = default);
+        Task<IEnumerable<T>> GetByTitle(string Title, CancellationToken Cancel = default);
 
         /// <summary>Удаление записи с указанным заголовком из репозитория</summary>
         /// <param name="Title">Заголовок удаляемой записи</param>
         /// <param name="Cancel">Признак отмены асинхронной операции</param>
         /// <returns>Удалённая из репозитория запись в случае её наличия и null, если такой записи в репозитории не было</returns>
-        Task<T> DeleteByTitle(string Title, CancellationToken Cancel = default);
+        Task<IEnumerable<T>> DeleteByTitle(string Title, CancellationToken Cancel = default);
 
         /// <summary>Проверка - существует ли в репозитории запись с указанным телом</summary>
         /// <param name="Body">Тело записи</param>
@@ -32,13 +33,13 @@ namespace MyNotes.Interfaces.Base.Repositories
         /// <param name="Body">Тело записи, которую требуется получить из репозитория</param>
         /// <param name="Cancel">Признак отмены асинхронной операции</param>
         /// <returns>Запись с указанным телом в случае её наличия, и null, если записи с заданным телом в репозитории нет</returns>
-        Task<T> GetByBody(string Body, CancellationToken Cancel = default);
+        Task<IEnumerable<T>> GetByBody(string Body, CancellationToken Cancel = default);
 
         /// <summary>Удаление записи с указанным телом из репозитория</summary>
         /// <param name="Body">Тело удаляемой записи</param>
         /// <param name="Cancel">Признак отмены асинхронной операции</param>
         /// <returns>Удалённая из репозитория запись в случае её наличия и null, если такой записи в репозитории не было</returns>
-        Task<T> DeleteByBody(string Body, CancellationToken Cancel = default);
+        Task<IEnumerable<T>> DeleteByBody(string Body, CancellationToken Cancel = default);
 
         /// <summary>Проверка - существует ли в репозитории запись с указанным автором</summary>
         /// <param name="Author">Автор записи</param>
@@ -50,13 +51,14 @@ namespace MyNotes.Interfaces.Base.Repositories
         /// <param name="Author">Автор записи, которую требуется получить из репозитория</param>
         /// <param name="Cancel">Признак отмены асинхронной операции</param>
         /// <returns>Запись с указанным автором в случае её наличия, и null, если записи с заданным телом в репозитории нет</returns>
-        Task<T> GetByAuthor(IUser Author, CancellationToken Cancel = default);
+        Task<IEnumerable<T>> GetByAuthor(IUser Author, CancellationToken Cancel = default);
 
         /// <summary>Удаление записи с указанным автором из репозитория</summary>
         /// <param name="Author">Автор удаляемой записи</param>
         /// <param name="Cancel">Признак отмены асинхронной операции</param>
         /// <returns>Удалённая из репозитория запись в случае её наличия и null, если такой записи в репозитории не было</returns>
-        Task<T> DeleteByAuthor(IUser Author, CancellationToken Cancel = default);
-
+        Task<IEnumerable<T>> DeleteByAuthor(IUser Author, CancellationToken Cancel = default);
     }
+
+    public interface INoteRepository<T> : INoteRepository<T, int>, IRepository<T> where T : IEntity, INote { }
 }
