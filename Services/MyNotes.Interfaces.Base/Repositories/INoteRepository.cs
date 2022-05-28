@@ -2,7 +2,7 @@
 
 namespace MyNotes.Interfaces.Base.Repositories
 {
-    public interface INoteRepository<T, in TKey> : IRepository<T, TKey> where T : INote<TKey>
+    public interface INoteRepository<T> where T : INote
     {
         /// <summary>Проверка - существует ли в репозитории запись с указанным заголовком</summary>
         /// <param name="Title">Заголовок записи</param>
@@ -59,5 +59,4 @@ namespace MyNotes.Interfaces.Base.Repositories
         Task<T> DeleteByAuthor(IUser Author, CancellationToken Cancel = default);
 
     }
-    public interface INoteRepository<T> : INoteRepository<T, int>, IRepository<T> where T : INote { }
 }

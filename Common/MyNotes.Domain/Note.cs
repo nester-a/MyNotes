@@ -5,7 +5,7 @@ namespace MyNotes.Domain
 {
     /// <summary>Сущность записи</summary>
     /// <typeparam name="TKey">Тип первичного ключа</typeparam>
-    public class Note<TKey> : Entity<TKey>, INote<TKey> where TKey : IEquatable<TKey>
+    public class Note<TKey> : Entity<TKey>, INote where TKey : IEquatable<TKey>
     {
         /// <summary>Заголовок</summary>
         public string Title { get; set; }
@@ -22,5 +22,5 @@ namespace MyNotes.Domain
 
     }
     /// <summary>Сущность записи</summary>
-    public class Note : Note<int>, INote { }
+    public class Note : Note<int> { }
 }
