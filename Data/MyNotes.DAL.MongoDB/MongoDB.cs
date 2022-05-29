@@ -11,6 +11,11 @@ namespace MyNotes.DAL.MongoDB
             _client = new MongoClient (connectionString);
             _db = _client.GetDatabase(Names.MyNotes);
         }
+        public MongoDB(string dbName, string connectionString) : base(connectionString)
+        {
+            _client = new MongoClient(connectionString);
+            _db = _client.GetDatabase(dbName);
+        }
         public IMongoCollection<T> GetCollection<T>(string name)
         {
             return _db.GetCollection<T>(name);

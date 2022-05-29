@@ -16,13 +16,22 @@ namespace MyNotes.Tests.Data.MyNotesDALMongoDB
             Body = "Hello world",
             Author = new User() { Name = "Me" },
         };
-        static DAL.MongoDB.MongoDB dB = new DAL.MongoDB.MongoDB("mongodb://localhost:27017");
+        static DAL.MongoDB.MongoDB dB = new DAL.MongoDB.MongoDB("Tests", "mongodb://localhost:27017");
         MongoNoteRepository<Note<string>> repo = new MongoNoteRepository<Note<string>>(dB);
 
         [TestMethod]
-        public void MongoNoteRepository_Should_Return_Smth()
+        public void MongoNoteRepository_Add_Return_Added_Item()
         {
-            var res = repo.Add(note);
+            var taskRes = repo.Add(note);
+            var res = taskRes.Result;
+
+
+            Assert.True(taskRes.IsCompleted);
+            Assert.True(res is Note<string>);
+            Assert.True(res.Id == note.Id);
+            Assert.True(res.Title == note.Title);
+            Assert.True(res.Body == note.Body);
+            Assert.True(res.Author == note.Author);
         }
     }
 }
