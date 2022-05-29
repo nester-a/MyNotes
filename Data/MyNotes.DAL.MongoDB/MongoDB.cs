@@ -6,10 +6,10 @@ namespace MyNotes.DAL.MongoDB
     {
         IMongoDatabase _db;
         IMongoClient _client;
-        public MongoDB (string databaseName, string connectionString) : base(connectionString)
+        public MongoDB (string connectionString) : base(connectionString)
         {
             _client = new MongoClient (connectionString);
-            _db = _client.GetDatabase(databaseName);
+            _db = _client.GetDatabase(Names.MyNotes);
         }
         public IMongoCollection<T> GetCollection<T>(string name)
         {
