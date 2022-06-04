@@ -4,6 +4,7 @@ using MongoDB.Driver;
 using MyNotes.DAL.MongoDB;
 using MyNotes.Domain;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Assert = Xunit.Assert;
 
@@ -21,6 +22,24 @@ namespace MyNotes.Tests.Data.MyNotesDALMongoDB
         };
         static DAL.MongoDB.MongoDB dB = new DAL.MongoDB.MongoDB("Tests", "mongodb://localhost:27017");
         MongoNoteRepository<Note<string>> repo = new MongoNoteRepository<Note<string>>(dB);
+
+        List<Note<string>> notes = new List<Note<string>>()
+        {
+            new Note<string>()
+            {
+                Id = ObjectId.GenerateNewId().ToString(),
+                Title = "Hello-1",
+                Body = "Hello world-1",
+                Author = new User() { Name = "Me-1" },
+            },
+            new Note<string>()
+            {
+                Id = ObjectId.GenerateNewId().ToString(),
+                Title = "Hello-2",
+                Body = "Hello world-2",
+                Author = new User() { Name = "Me-2" },
+            },
+        };
 
         [TestMethod]
         public void MongoNoteRepository_AddAsync_Returns_Added_Item()
@@ -135,5 +154,7 @@ namespace MyNotes.Tests.Data.MyNotesDALMongoDB
 
             Assert.True(catched);
         }
+
+        
     }
 }
