@@ -9,12 +9,35 @@ namespace MyNotes.DAL.MongoDB
     {
         public MongoNoteRepository(MongoDB db) : base(db, Names.Notes) { }
 
+        /// <summary>Асинхронно добавляет элемент в репозиторий</summary>
+        /// <param name="item">Добавляемый элемент</param>
+        /// <param name="Cancel">Токен отмены</param>
+        /// <returns>Добавляемый элемент</returns>
+        /// <exception cref="AggregateException">В случае если элемент уже есть в репозитории, или добавляемый элемент - <b>null</b>></exception>
         public async Task<T> AddAsync(T item, CancellationToken Cancel = default)
         {
-            if (item is null) throw new ArgumentNullException(nameof(item));
             await _col.InsertOneAsync(item);
             return item;
         }
+
+        /// <summary>Добавляет элемент в репозиторий</summary>
+        /// <param name="item">Добавляемый элемент</param>
+        /// <returns>Добавляемый элемент</returns>
+        /// <exception cref="MongoWriteException">В случае если элемент уже есть в репозитории</exception>
+        /// <exception cref="ArgumentNullException">В случае если добавляемый элемент - <b>null</b>></exception>
+        public T Add(T item)
+        {
+            try
+            {
+                _col.InsertOne(item);
+            }
+            catch
+            {
+                throw;
+            }
+            return item;
+        }
+
 
         public Task AddRangeAsync(IEnumerable<T> items, CancellationToken Cancel = default)
         {
