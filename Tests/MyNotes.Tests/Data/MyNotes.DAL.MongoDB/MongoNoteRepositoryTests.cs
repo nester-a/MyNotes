@@ -112,7 +112,7 @@ namespace MyNotes.Tests.Data.MyNotesDALMongoDB
         }
 
         [TestMethod]
-        public void MongoNoteRepository_Add_Returns_AggregateException()
+        public void MongoNoteRepository_Add_Returns_MongoWriteException()
         {
             bool catched = false;
             var taskRes = repo.Add(note);
@@ -138,7 +138,7 @@ namespace MyNotes.Tests.Data.MyNotesDALMongoDB
         }
 
         [TestMethod]
-        public void MongoNoteRepository_Add_Returns_AggregateException_NullArgument()
+        public void MongoNoteRepository_Add_Returns_ArgumentNullException()
         {
             bool catched = false;
 
@@ -155,6 +155,46 @@ namespace MyNotes.Tests.Data.MyNotesDALMongoDB
             Assert.True(catched);
         }
 
-        
+        [TestMethod]
+        public void MongoNoteRepository_AddRange_Success()
+        {
+            repo.AddRange(notes);
+        }
+
+        [TestMethod]
+        public void MongoNoteRepository_AddRange_Returns_MongoBulkWriteException()
+        {
+            bool catched = false;
+            repo.AddRange(notes);
+
+            try
+            {
+                repo.AddRange(notes);
+            }
+            catch(MongoBulkWriteException ex)
+            {
+                catched= true;
+                Assert.True(ex is MongoBulkWriteException);
+            }
+            Assert.True(catched);
+        }
+
+        [TestMethod]
+        public void MongoNoteRepository_AddRange_Returns_ArgumentNullException()
+        {
+            bool catched = false;
+
+            try
+            {
+                repo.AddRange(null);
+            }
+            catch (ArgumentNullException ex)
+            {
+                catched = true;
+                Assert.True(ex is ArgumentNullException);
+            }
+
+            Assert.True(catched);
+        }
     }
 }

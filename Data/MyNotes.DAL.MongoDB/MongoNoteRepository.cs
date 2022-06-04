@@ -4,7 +4,7 @@ using MyNotes.Interfaces.Base.Repositories;
 
 namespace MyNotes.DAL.MongoDB
 {
-    public class MongoNoteRepository<T> : MongoRepository<T>//, INoteRepositoryAsync<T, string> where T : Note<string>
+    public class MongoNoteRepository<T> : MongoRepository<T>, INoteRepositoryAsync<T, string> where T : Note<string>
     {
         public MongoNoteRepository(MongoDB db) : base(db, Names.Notes) { }
 
@@ -41,10 +41,21 @@ namespace MyNotes.DAL.MongoDB
         /// <param name="items">Добавляемые элементы</param>
         /// <param name="Cancel">Токен отмены</param>
         /// <exception cref="AggregateException">В случае если элемент уже есть в репозитории, или добавляемый элемент - <b>null</b>></exception>
-        public async Task AddRangeAsync(ICollection<T> items, CancellationToken Cancel = default)
+        public async Task AddRangeAsync(IEnumerable<T> items, CancellationToken Cancel = default)
         {
             await _col.InsertManyAsync(items);
             throw new NotImplementedException();
+        }
+        public void AddRange(IEnumerable<T> items)
+        {
+            try
+            {
+                _col.InsertMany(items);
+            }
+            catch
+            {
+                throw;
+            }
         }
 
         public Task<T> DeleteAsync(T item, CancellationToken Cancel = default)
