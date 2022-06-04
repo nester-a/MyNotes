@@ -60,5 +60,5 @@ namespace MyNotes.Interfaces.Base.Repositories
         Task<IEnumerable<T>> DeleteByAuthorAsync(IUser Author, CancellationToken Cancel = default);
     }
 
-    public interface INoteRepositoryAsync<T> : INoteRepositoryAsync<T, int>, IRepository<T> where T : IEntity, INote { }
+    public interface INoteRepositoryAsync<T> : INoteRepositoryAsync<T, int>, IRepositoryAsync<T> where T : IEntity, INote { }
 }

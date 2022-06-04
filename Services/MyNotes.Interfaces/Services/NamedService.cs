@@ -6,39 +6,39 @@ namespace MyNotes.Interfaces.Services
 {
     public abstract class NamedService<T, TKey> : Service<T, TKey>, INamedService<T, TKey> where T : NamedEntity<TKey> where TKey : IEquatable<TKey>
     {
-        private readonly INamedRepository<T, TKey> _namedRepository;
+        private readonly INamedRepositoryAsync<T, TKey> _namedRepository;
 
-        protected NamedService(INamedRepository<T, TKey> namedRepository) : base(namedRepository)
+        protected NamedService(INamedRepositoryAsync<T, TKey> namedRepository) : base(namedRepository)
         {
             _namedRepository = namedRepository;
         }
 
         public ICollection<T> DeleteAllByName(string name)
         {
-            var result = _namedRepository.ExistName(name).Result;
+            var result = _namedRepository.ExistNameAsync(name).Result;
             if (result)
             {
-                return _namedRepository.DeleteByName(name).Result.ToList();
+                return _namedRepository.DeleteByNameAsync(name).Result.ToList();
             }
             throw new ArgumentException($"Repository doesn't contain any entity with this {name}");
         }
 
         public ICollection<T> GetAllByName(string name)
         {
-            var result = _namedRepository.ExistName(name).Result;
+            var result = _namedRepository.ExistNameAsync(name).Result;
             if (result)
             {
-                return _namedRepository.GetByName(name).Result.ToList();
+                return _namedRepository.GetByNameAsync(name).Result.ToList();
             }
             throw new ArgumentException($"Repository doesn't contain any entity with this {name}");
         }
 
         public ICollection<T> UpdateAllByName(string name, T entityForUpdate)
         {
-            var result = _namedRepository.ExistName(name).Result;
+            var result = _namedRepository.ExistNameAsync(name).Result;
             if (result)
             {
-                var tmp = _namedRepository.GetByName(name).Result;
+                var tmp = _namedRepository.GetByNameAsync(name).Result;
                 foreach (var item in tmp)
                 {
                     item.Name = entityForUpdate.Name;
@@ -50,6 +50,6 @@ namespace MyNotes.Interfaces.Services
     }
     public abstract class NamedService<T> : NamedService<T, int> where T : NamedEntity<int>
     {
-        protected NamedService(INamedRepository<T, int> repository) : base(repository) { }
+        protected NamedService(INamedRepositoryAsync<T, int> repository) : base(repository) { }
     }
 }

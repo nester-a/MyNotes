@@ -13,7 +13,7 @@ namespace MyNotes.Interfaces.Base.Repositories
         /// <returns>Истина, если в репозитории нет ни одной сущности</returns>
         async Task<bool> IsEmptyAsync(CancellationToken Cancel = default)
         {
-            var count = await GetCount(Cancel).ConfigureAwait(false);
+            var count = await GetCountAsync(Cancel).ConfigureAwait(false);
             return count > 0;
         }
 
@@ -82,10 +82,10 @@ namespace MyNotes.Interfaces.Base.Repositories
         /// <returns>Сущность из репозитория с обновлёнными данными</returns>
         async Task<T?> UpdateAsync(TKey id, Action<T> ItemUpdated, CancellationToken Cancel = default)
         {
-            if (await GetById(id, Cancel).ConfigureAwait(false) is not { } item)
+            if (await GetByIdAsync(id, Cancel).ConfigureAwait(false) is not { } item)
                 return default;
             ItemUpdated(item);
-            await Update(item, Cancel).ConfigureAwait(false);
+            await UpdateAsync(item, Cancel).ConfigureAwait(false);
             return item;
         }
 

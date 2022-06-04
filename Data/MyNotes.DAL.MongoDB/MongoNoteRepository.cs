@@ -12,7 +12,6 @@ namespace MyNotes.DAL.MongoDB
         public async Task<T> AddAsync(T item, CancellationToken Cancel = default)
         {
             if (item is null) throw new ArgumentNullException(nameof(item));
-            //if (_col.Contains(item)) throw new InvalidOperationException($"Database already contains this element-{typeof(T)}-{nameof(item)}");
             await _col.InsertOneAsync(item);
             return item;
         }
