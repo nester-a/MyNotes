@@ -5,7 +5,6 @@ using MyNotes.DAL.MongoDB;
 using MyNotes.Domain;
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using Assert = Xunit.Assert;
 
 namespace MyNotes.Tests.Data.MyNotesDALMongoDB
@@ -46,12 +45,15 @@ namespace MyNotes.Tests.Data.MyNotesDALMongoDB
         {
             var taskRes = repo.AddAsync(note).Result;
 
-
             Assert.True(taskRes is Note<string>);
             Assert.True(taskRes.Id == note.Id);
             Assert.True(taskRes.Title == note.Title);
             Assert.True(taskRes.Body == note.Body);
             Assert.True(taskRes.Author == note.Author);
+
+            var filter1 = new BsonDocument("_id", $"{note.Id}");
+            var result = dB.GetCollection<Note<string>>("Notes").Find(filter1).ToList();
+            Assert.True(result.Count == 1);
         }
 
         [TestMethod]
@@ -66,6 +68,10 @@ namespace MyNotes.Tests.Data.MyNotesDALMongoDB
             Assert.True(taskRes.Title == note.Title);
             Assert.True(taskRes.Body == note.Body);
             Assert.True(taskRes.Author == note.Author);
+
+            var filter1 = new BsonDocument("_id", $"{note.Id}");
+            var result = dB.GetCollection<Note<string>>("Notes").Find(filter1).ToList();
+            Assert.True(result.Count == 1);
 
             try
             {
@@ -109,6 +115,10 @@ namespace MyNotes.Tests.Data.MyNotesDALMongoDB
             Assert.True(taskRes.Title == note.Title);
             Assert.True(taskRes.Body == note.Body);
             Assert.True(taskRes.Author == note.Author);
+
+            var filter1 = new BsonDocument("_id", $"{note.Id}");
+            var result = dB.GetCollection<Note<string>>("Notes").Find(filter1).ToList();
+            Assert.True(result.Count == 1);
         }
 
         [TestMethod]
@@ -123,6 +133,10 @@ namespace MyNotes.Tests.Data.MyNotesDALMongoDB
             Assert.True(taskRes.Title == note.Title);
             Assert.True(taskRes.Body == note.Body);
             Assert.True(taskRes.Author == note.Author);
+
+            var filter1 = new BsonDocument("_id", $"{note.Id}");
+            var result = dB.GetCollection<Note<string>>("Notes").Find(filter1).ToList();
+            Assert.True(result.Count == 1);
 
             try
             {
@@ -159,6 +173,15 @@ namespace MyNotes.Tests.Data.MyNotesDALMongoDB
         public void MongoNoteRepository_AddRange_Success()
         {
             repo.AddRange(notes);
+
+            var filter1 = new BsonDocument("_id", $"{notes[0].Id}");
+            var result = dB.GetCollection<Note<string>>("Notes").Find(filter1).ToList();
+            Assert.True(result.Count == 1);
+
+            var filter2 = new BsonDocument("_id", $"{notes[1].Id}");
+            result = dB.GetCollection<Note<string>>("Notes").Find(filter2).ToList();
+            Assert.True(result.Count == 1);
+
         }
 
         [TestMethod]
@@ -166,6 +189,14 @@ namespace MyNotes.Tests.Data.MyNotesDALMongoDB
         {
             bool catched = false;
             repo.AddRange(notes);
+
+            var filter1 = new BsonDocument("_id", $"{notes[0].Id}");
+            var result = dB.GetCollection<Note<string>>("Notes").Find(filter1).ToList();
+            Assert.True(result.Count == 1);
+
+            var filter2 = new BsonDocument("_id", $"{notes[1].Id}");
+            result = dB.GetCollection<Note<string>>("Notes").Find(filter2).ToList();
+            Assert.True(result.Count == 1);
 
             try
             {
@@ -201,12 +232,28 @@ namespace MyNotes.Tests.Data.MyNotesDALMongoDB
         public void MongoNoteRepository_AddRangeAsync_Success()
         {
             repo.AddRangeAsync(notes).Wait();
+
+            var filter1 = new BsonDocument("_id", $"{notes[0].Id}");
+            var result = dB.GetCollection<Note<string>>("Notes").Find(filter1).ToList();
+            Assert.True(result.Count == 1);
+
+            var filter2 = new BsonDocument("_id", $"{notes[1].Id}");
+            result = dB.GetCollection<Note<string>>("Notes").Find(filter2).ToList();
+            Assert.True(result.Count == 1);
         }
         [TestMethod]
         public void MongoNoteRepository_AddRangeAsync_Returns_AggregateException()
         {
             bool catched = false;
             repo.AddRangeAsync(notes).Wait();
+
+            var filter1 = new BsonDocument("_id", $"{notes[0].Id}");
+            var result = dB.GetCollection<Note<string>>("Notes").Find(filter1).ToList();
+            Assert.True(result.Count == 1);
+
+            var filter2 = new BsonDocument("_id", $"{notes[1].Id}");
+            result = dB.GetCollection<Note<string>>("Notes").Find(filter2).ToList();
+            Assert.True(result.Count == 1);
 
             try
             {
@@ -228,6 +275,70 @@ namespace MyNotes.Tests.Data.MyNotesDALMongoDB
             try
             {
                 repo.AddRangeAsync(null).Wait();
+            }
+            catch (AggregateException ex)
+            {
+                catched = true;
+                Assert.True(ex is AggregateException);
+            }
+
+            Assert.True(catched);
+        }
+
+        [TestMethod]
+        public void MongoNoteRepository_DeleteAsync_Returns_DeletedItem()
+        {
+            var taskRes = repo.AddAsync(note).Result;
+
+            Assert.True(taskRes is Note<string>);
+            Assert.True(taskRes.Id == note.Id);
+            Assert.True(taskRes.Title == note.Title);
+            Assert.True(taskRes.Body == note.Body);
+            Assert.True(taskRes.Author == note.Author);
+
+            var deleteRes = repo.DeleteAsync(note).Result;
+
+            Assert.True(deleteRes is Note<string>);
+            Assert.True(taskRes.Id == deleteRes.Id);
+            Assert.True(taskRes.Title == deleteRes.Title);
+            Assert.True(taskRes.Body == deleteRes.Body);
+            Assert.True(taskRes.Author == deleteRes.Author);
+
+            var filter = new BsonDocument("_id", $"{taskRes.Id}");
+            var result = dB.GetCollection<Note<string>>("Notes").Find(filter).ToList();
+
+            Assert.True(result.Count == 0);
+        }
+
+        [TestMethod]
+        public void MongoNoteRepository_DeleteAsync_Returns_AggregateException()
+        {
+            bool catched = false;
+
+            var filter = new BsonDocument("_id", $"{note.Id}");
+            var result = dB.GetCollection<Note<string>>("Notes").Find(filter).ToList();
+            Assert.True(result.Count == 0);
+            try
+            {
+                var res = repo.DeleteAsync(note).Result;
+            }
+            catch (AggregateException ex)
+            {
+                catched = true;
+                Assert.True(ex is AggregateException);
+            }
+
+            Assert.True(catched);
+        }
+
+        [TestMethod]
+        public void MongoNoteRepository_DeleteAsync_Returns_AggregateException_ArgumentNull()
+        {
+            bool catched = false;
+
+            try
+            {
+                var res = repo.DeleteAsync(null).Result;
             }
             catch (AggregateException ex)
             {

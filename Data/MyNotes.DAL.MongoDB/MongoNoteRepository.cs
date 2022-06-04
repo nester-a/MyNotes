@@ -13,7 +13,7 @@ namespace MyNotes.DAL.MongoDB
         /// <param name="item">Добавляемый элемент</param>
         /// <param name="Cancel">Токен отмены</param>
         /// <returns>Добавляемый элемент</returns>
-        /// <exception cref="AggregateException">В случае если элемент уже есть в репозитории, или добавляемый элемент - <b>null</b>></exception>
+        /// <exception cref="AggregateException">В случае если элемент уже есть в репозитории, или добавляемый элемент - <b>null</b></exception>
         public async Task<T> AddAsync(T item, CancellationToken Cancel = default)
         {
             await _col.InsertOneAsync(item);
@@ -24,7 +24,7 @@ namespace MyNotes.DAL.MongoDB
         /// <param name="item">Добавляемый элемент</param>
         /// <returns>Добавляемый элемент</returns>
         /// <exception cref="MongoWriteException">В случае если элемент уже есть в репозитории</exception>
-        /// <exception cref="ArgumentNullException">В случае если добавляемый элемент - <b>null</b>></exception>
+        /// <exception cref="ArgumentNullException">В случае если добавляемый элемент - <b>null</b></exception>
         public T Add(T item)
         {
             try
@@ -41,16 +41,16 @@ namespace MyNotes.DAL.MongoDB
         /// <summary>Асинхронно добавляет элементы в репозиторий</summary>
         /// <param name="items">Добавляемые элементы</param>
         /// <param name="Cancel">Токен отмены</param>
-        /// <exception cref="AggregateException">В случае если какой-то из элементов уже есть в репозиторие, или добавляемый элемент - <b>null</b>></exception>
+        /// <exception cref="AggregateException">В случае если какой-то из элементов уже есть в репозиторие, или добавляемый элемент - <b>null</b></exception>
         public async Task AddRangeAsync(IEnumerable<T> items, CancellationToken Cancel = default)
         {
             await _col.InsertManyAsync(items, null, Cancel);
         }
 
         /// <summary>Добавляет элементы в репозиторий</summary>
-        /// <param name="item">Добавляемые элементы</param>
+        /// <param name="items">Добавляемые элементы</param>
         /// <exception cref="MongoBulkWriteException">В случае если какой-то из элементов уже есть в репозиторие</exception>
-        /// <exception cref="ArgumentNullException">В случае если добавляемое перечесление элементов - <b>null</b>></exception>
+        /// <exception cref="ArgumentNullException">В случае если добавляемое перечесление элементов - <b>null</b></exception>
         public void AddRange(IEnumerable<T> items)
         {
             try
@@ -63,14 +63,26 @@ namespace MyNotes.DAL.MongoDB
             }
         }
 
-
+        /// <summary>Асинхронно удаляет элемент из репозитория</summary>
+        /// <param name="item">Удаляемый элемент</param>
+        /// <param name="Cancel">Токен отмены</param>
+        /// <returns>Удалённый элемент</returns>
+        /// <exception cref="AggregateException">В случае если удаляемый элемент отсутствует в репозиторие или <b>null</b></exception>
         public async Task<T> DeleteAsync(T item, CancellationToken Cancel = default)
         {
             var res = await _col.DeleteOneAsync(new BsonDocument("_id", item.Id), Cancel);
-
+            if(res.DeletedCount == 0)
+            {
+                throw new ArgumentException("Item not found");
+            }
             return item;
         }
 
+        public T Delete(T item)
+        {
+            _col.DeleteOne(new BsonDocument("_id", item.Id));
+            return item;
+        }
         public Task<IEnumerable<T>> DeleteByAuthorAsync(IUser Author, CancellationToken Cancel = default)
         {
             throw new NotImplementedException();
