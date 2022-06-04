@@ -1,4 +1,5 @@
-﻿using MyNotes.Domain;
+﻿using MongoDB.Bson;
+using MyNotes.Domain;
 using MyNotes.Domain.Base;
 using MyNotes.Interfaces.Base.Repositories;
 
@@ -37,15 +38,19 @@ namespace MyNotes.DAL.MongoDB
             return item;
         }
 
-        /// <summary>Асинхронно добавляет элементы в репозиторий (метод не определён)</summary>
+        /// <summary>Асинхронно добавляет элементы в репозиторий</summary>
         /// <param name="items">Добавляемые элементы</param>
         /// <param name="Cancel">Токен отмены</param>
-        /// <exception cref="AggregateException">В случае если элемент уже есть в репозитории, или добавляемый элемент - <b>null</b>></exception>
+        /// <exception cref="AggregateException">В случае если какой-то из элементов уже есть в репозиторие, или добавляемый элемент - <b>null</b>></exception>
         public async Task AddRangeAsync(IEnumerable<T> items, CancellationToken Cancel = default)
         {
-            await _col.InsertManyAsync(items);
-            throw new NotImplementedException();
+            await _col.InsertManyAsync(items, null, Cancel);
         }
+
+        /// <summary>Добавляет элементы в репозиторий</summary>
+        /// <param name="item">Добавляемые элементы</param>
+        /// <exception cref="MongoBulkWriteException">В случае если какой-то из элементов уже есть в репозиторие</exception>
+        /// <exception cref="ArgumentNullException">В случае если добавляемое перечесление элементов - <b>null</b>></exception>
         public void AddRange(IEnumerable<T> items)
         {
             try
@@ -58,9 +63,12 @@ namespace MyNotes.DAL.MongoDB
             }
         }
 
-        public Task<T> DeleteAsync(T item, CancellationToken Cancel = default)
+
+        public async Task<T> DeleteAsync(T item, CancellationToken Cancel = default)
         {
-            throw new NotImplementedException();
+            var res = await _col.DeleteOneAsync(new BsonDocument("_id", item.Id), Cancel);
+
+            return item;
         }
 
         public Task<IEnumerable<T>> DeleteByAuthorAsync(IUser Author, CancellationToken Cancel = default)

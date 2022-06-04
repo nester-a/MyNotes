@@ -196,5 +196,46 @@ namespace MyNotes.Tests.Data.MyNotesDALMongoDB
 
             Assert.True(catched);
         }
+
+        [TestMethod]
+        public void MongoNoteRepository_AddRangeAsync_Success()
+        {
+            repo.AddRangeAsync(notes).Wait();
+        }
+        [TestMethod]
+        public void MongoNoteRepository_AddRangeAsync_Returns_AggregateException()
+        {
+            bool catched = false;
+            repo.AddRangeAsync(notes).Wait();
+
+            try
+            {
+                repo.AddRangeAsync(notes).Wait();
+            }
+            catch (AggregateException ex)
+            {
+                catched = true;
+                Assert.True(ex is AggregateException);
+            }
+            Assert.True(catched);
+        }
+
+        [TestMethod]
+        public void MongoNoteRepository_AddRangeAsync_Returns_AggregateException_ArgumentNull()
+        {
+            bool catched = false;
+
+            try
+            {
+                repo.AddRangeAsync(null).Wait();
+            }
+            catch (AggregateException ex)
+            {
+                catched = true;
+                Assert.True(ex is AggregateException);
+            }
+
+            Assert.True(catched);
+        }
     }
 }
