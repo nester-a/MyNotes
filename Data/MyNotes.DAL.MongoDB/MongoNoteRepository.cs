@@ -1,4 +1,5 @@
 ﻿using MongoDB.Bson;
+using MongoDB.Driver;
 using MyNotes.Domain;
 using MyNotes.Domain.Base;
 using MyNotes.Interfaces.Base.Repositories;
@@ -98,7 +99,7 @@ namespace MyNotes.DAL.MongoDB
         /// <param name="Author">Автор удаляемых элементов</param>
         /// <param name="Cancel">Токен отмены</param>
         /// <returns>Перечесление удалённых элементов</returns>
-        /// <exception cref="AggregateException">В случае если в репозитории нет элементов с этим автором или перемеданный автор - <b>null</b></exception>
+        /// <exception cref="AggregateException">В случае если в репозитории нет элементов с этим автором или переданный автор - <b>null</b></exception>
         public async Task<IEnumerable<T>> DeleteByAuthorAsync(IUser Author, CancellationToken Cancel = default)
         {
             var author = Author as User;
@@ -121,6 +122,30 @@ namespace MyNotes.DAL.MongoDB
                 }
             }
             var del = await _col.DeleteManyAsync(filter, Cancel);
+            if (del.DeletedCount == 0) throw new ArgumentException("Items not found");
+            return res;
+        }
+
+        /// <summary>Удаляет элементы с указанным автором из репозитория</summary>
+        /// <param name="Author">Автор удаляемых элементов</param>
+        /// <returns>Перечесление удалённых элементов</returns>
+        /// <exception cref="ArgumentException">В случае если в репозитории нет элементов с этим автором</exception>
+        /// <exception cref="ArgumentNullException">В случае если переданный автор - <b>null</b></exception>
+        public IEnumerable<T> DeleteByAuthor(IUser Author)
+        {
+            if (Author is null) throw new ArgumentNullException("Author is null");
+            var author = Author as User;
+            var filter = new BsonDocument();
+            var authorFilter = new BsonDocument();
+            authorFilter.AddRange(new BsonDocument("_t", author.GetType().Name));
+            authorFilter.AddRange(new BsonDocument("_id", author.Id));
+            authorFilter.AddRange(new BsonDocument("Name", author.Name));
+            filter.Add("Author", authorFilter);
+            List<T> res;
+            var cursor = _col.Find(filter);
+            res = cursor.ToList();
+
+            var del = _col.DeleteMany(filter);
             if (del.DeletedCount == 0) throw new ArgumentException("Items not found");
             return res;
         }
