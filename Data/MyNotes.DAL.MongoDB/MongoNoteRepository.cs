@@ -78,9 +78,18 @@ namespace MyNotes.DAL.MongoDB
             return item;
         }
 
+        /// <summary>Удаляет элемент из репозитория</summary>
+        /// <param name="item">Удаляемый элемент</param>
+        /// <returns>Удалённый элемент</returns>
+        /// <exception cref="AggregateException">В случае если удаляемый элемент отсутствует в репозиторие или <b>null</b></exception>
         public T Delete(T item)
         {
-            _col.DeleteOne(new BsonDocument("_id", item.Id));
+            if(item is null) throw new ArgumentNullException("Item is null");
+            var res = _col.DeleteOne(new BsonDocument("_id", item.Id));
+            if (res.DeletedCount == 0)
+            {
+                throw new ArgumentException("Item not found");
+            }
             return item;
         }
         public Task<IEnumerable<T>> DeleteByAuthorAsync(IUser Author, CancellationToken Cancel = default)

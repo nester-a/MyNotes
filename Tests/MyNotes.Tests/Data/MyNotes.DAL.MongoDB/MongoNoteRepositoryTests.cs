@@ -348,5 +348,67 @@ namespace MyNotes.Tests.Data.MyNotesDALMongoDB
 
             Assert.True(catched);
         }
+
+        [TestMethod]
+        public void MongoNoteRepository_Delete_Returns_DeletedItem()
+        {
+            var taskRes = repo.AddAsync(note).Result;
+
+            Assert.True(taskRes is Note<string>);
+            Assert.True(taskRes.Id == note.Id);
+            Assert.True(taskRes.Title == note.Title);
+            Assert.True(taskRes.Body == note.Body);
+            Assert.True(taskRes.Author == note.Author);
+
+            var deleteRes = repo.Delete(note);
+
+            Assert.True(deleteRes is Note<string>);
+            Assert.True(taskRes.Id == deleteRes.Id);
+            Assert.True(taskRes.Title == deleteRes.Title);
+            Assert.True(taskRes.Body == deleteRes.Body);
+            Assert.True(taskRes.Author == deleteRes.Author);
+
+            var filter = new BsonDocument("_id", $"{taskRes.Id}");
+            var result = dB.GetCollection<Note<string>>("Notes").Find(filter).ToList();
+
+            Assert.True(result.Count == 0);
+        }
+        [TestMethod]
+        public void MongoNoteRepository_Delete_Returns_ArgumentException()
+        {
+            bool catched = false;
+
+            var filter = new BsonDocument("_id", $"{note.Id}");
+            var result = dB.GetCollection<Note<string>>("Notes").Find(filter).ToList();
+            Assert.True(result.Count == 0);
+            try
+            {
+                var res = repo.Delete(note);
+            }
+            catch (ArgumentException ex)
+            {
+                catched = true;
+                Assert.True(ex is ArgumentException);
+            }
+            Assert.True(catched);
+        }
+
+        [TestMethod]
+        public void MongoNoteRepository_Delete_Returns_AggregateException_ArgumentNull()
+        {
+            bool catched = false;
+
+            try
+            {
+                var res = repo.Delete(null);
+            }
+            catch (ArgumentNullException ex)
+            {
+                catched = true;
+                Assert.True(ex is ArgumentNullException);
+            }
+
+            Assert.True(catched);
+        }
     }
 }
