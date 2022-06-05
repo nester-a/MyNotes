@@ -3,6 +3,7 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using MyNotes.DAL.MongoDB;
 using MyNotes.Domain;
+using MyNotes.Domain.Base;
 using System;
 using System.Collections.Generic;
 using Assert = Xunit.Assert;
@@ -344,6 +345,236 @@ namespace MyNotes.Tests.Data.MyNotesDALMongoDB
             {
                 catched = true;
                 Assert.True(ex is AggregateException);
+            }
+
+            Assert.True(catched);
+        }
+
+        [TestMethod]
+        public void MongoNoteRepository_Delete_Returns_DeletedItem()
+        {
+            var taskRes = repo.AddAsync(note).Result;
+
+            Assert.True(taskRes is Note<string>);
+            Assert.True(taskRes.Id == note.Id);
+            Assert.True(taskRes.Title == note.Title);
+            Assert.True(taskRes.Body == note.Body);
+            Assert.True(taskRes.Author == note.Author);
+
+            var deleteRes = repo.Delete(note);
+
+            Assert.True(deleteRes is Note<string>);
+            Assert.True(taskRes.Id == deleteRes.Id);
+            Assert.True(taskRes.Title == deleteRes.Title);
+            Assert.True(taskRes.Body == deleteRes.Body);
+            Assert.True(taskRes.Author == deleteRes.Author);
+
+            var filter = new BsonDocument("_id", $"{taskRes.Id}");
+            var result = dB.GetCollection<Note<string>>("Notes").Find(filter).ToList();
+
+            Assert.True(result.Count == 0);
+        }
+
+        [TestMethod]
+        public void MongoNoteRepository_Delete_Returns_ArgumentException()
+        {
+            bool catched = false;
+
+            var filter = new BsonDocument("_id", $"{note.Id}");
+            var result = dB.GetCollection<Note<string>>("Notes").Find(filter).ToList();
+            Assert.True(result.Count == 0);
+            try
+            {
+                var res = repo.Delete(note);
+            }
+            catch (ArgumentException ex)
+            {
+                catched = true;
+                Assert.True(ex is ArgumentException);
+            }
+            Assert.True(catched);
+        }
+
+        [TestMethod]
+        public void MongoNoteRepository_Delete_Returns_AggregateException_ArgumentNull()
+        {
+            bool catched = false;
+
+            try
+            {
+                var res = repo.Delete(null);
+            }
+            catch (ArgumentNullException ex)
+            {
+                catched = true;
+                Assert.True(ex is ArgumentNullException);
+            }
+
+            Assert.True(catched);
+        }
+
+        [TestMethod]
+        public void MongoNoteRepository_DeleteByAuthorAsync_Returns_DeletedItems()
+        {
+            var taskRes = repo.AddAsync(note).Result;
+
+            Assert.True(taskRes is Note<string>);
+            Assert.True(taskRes.Id == note.Id);
+            Assert.True(taskRes.Title == note.Title);
+            Assert.True(taskRes.Body == note.Body);
+            Assert.True(taskRes.Author == note.Author);
+
+            var deleteRes = repo.DeleteByAuthorAsync(note.Author).Result;
+
+            Assert.True(deleteRes is IEnumerable<Note<string>>);
+
+            var author = note.Author as User;
+            foreach (var item in deleteRes)
+            {
+                var tmp = item.Author as User; 
+                Assert.True(item.Author is IUser);
+                Assert.True(tmp.Id == author.Id);
+                Assert.True(tmp.Name == author.Name);
+            }
+            
+            var filter = new BsonDocument();
+            var authorFilter = new BsonDocument();
+            authorFilter.AddRange(new BsonDocument("_t", author.GetType().Name));
+            authorFilter.AddRange(new BsonDocument("_id", author.Id));
+            authorFilter.AddRange(new BsonDocument("Name", author.Name));
+            filter.Add("Author", authorFilter);
+
+            var result = dB.GetCollection<Note<string>>("Notes").Find(filter).ToList();
+
+            Assert.True(result.Count == 0);
+        }
+
+        [TestMethod]
+        public void MongoNoteRepository_DeleteByAuthorAsync_Returns_AggregateException_ItemsNotFound()
+        {
+            bool catched = false;
+
+            var author = note.Author as User;
+            var filter = new BsonDocument();
+            var authorFilter = new BsonDocument();
+            authorFilter.AddRange(new BsonDocument("_t", author.GetType().Name));
+            authorFilter.AddRange(new BsonDocument("_id", author.Id));
+            authorFilter.AddRange(new BsonDocument("Name", author.Name));
+            filter.Add("Author", authorFilter);
+
+            var result = dB.GetCollection<Note<string>>("Notes").Find(filter).ToList();
+
+            Assert.True(result.Count == 0);
+            try
+            {
+                var deleteRes = repo.DeleteByAuthorAsync(note.Author).Result;
+            }
+            catch (AggregateException ex)
+            {
+                catched = true;
+                Assert.True(ex is AggregateException);
+            }
+            Assert.True(catched);
+        }
+
+        [TestMethod]
+        public void MongoNoteRepository_DeleteByAuthorAsync_Returns_AggregateException_ArgumentNull()
+        {
+            bool catched = false;
+
+            try
+            {
+                var res = repo.DeleteByAuthorAsync(null).Result;
+            }
+            catch (AggregateException ex)
+            {
+                catched = true;
+                Assert.True(ex is AggregateException);
+            }
+
+            Assert.True(catched);
+        }
+
+        [TestMethod]
+        public void MongoNoteRepository_DeleteByAuthor_Returns_DeletedItems()
+        {
+            var taskRes = repo.AddAsync(note).Result;
+
+            Assert.True(taskRes is Note<string>);
+            Assert.True(taskRes.Id == note.Id);
+            Assert.True(taskRes.Title == note.Title);
+            Assert.True(taskRes.Body == note.Body);
+            Assert.True(taskRes.Author == note.Author);
+
+            var author = note.Author as User;
+            var filter = new BsonDocument();
+            var authorFilter = new BsonDocument();
+            authorFilter.AddRange(new BsonDocument("_t", author.GetType().Name));
+            authorFilter.AddRange(new BsonDocument("_id", author.Id));
+            authorFilter.AddRange(new BsonDocument("Name", author.Name));
+            filter.Add("Author", authorFilter);
+            var result = dB.GetCollection<Note<string>>("Notes").Find(filter).ToList();
+            Assert.True(result.Count != 0);
+
+            var deleteRes = repo.DeleteByAuthor(note.Author);
+
+            Assert.True(deleteRes is IEnumerable<Note<string>>);
+
+
+            foreach (var item in deleteRes)
+            {
+                var tmp = item.Author as User;
+                Assert.True(item.Author is IUser);
+                Assert.True(tmp.Id == author.Id);
+                Assert.True(tmp.Name == author.Name);
+            }
+
+            result = dB.GetCollection<Note<string>>("Notes").Find(filter).ToList();
+
+            Assert.True(result.Count == 0);
+        }
+
+        [TestMethod]
+        public void MongoNoteRepository_DeleteByAuthor_Returns_ArgumentException_ItemsNotFound()
+        {
+            bool catched = false;
+
+            var author = note.Author as User;
+            var filter = new BsonDocument();
+            var authorFilter = new BsonDocument();
+            authorFilter.AddRange(new BsonDocument("_t", author.GetType().Name));
+            authorFilter.AddRange(new BsonDocument("_id", author.Id));
+            authorFilter.AddRange(new BsonDocument("Name", author.Name));
+            filter.Add("Author", authorFilter);
+
+            var result = dB.GetCollection<Note<string>>("Notes").Find(filter).ToList();
+
+            Assert.True(result.Count == 0);
+            try
+            {
+                var deleteRes = repo.DeleteByAuthor(note.Author);
+            }
+            catch (ArgumentException ex)
+            {
+                catched = true;
+                Assert.True(ex is ArgumentException);
+            }
+            Assert.True(catched);
+        }
+
+        [TestMethod]
+        public void MongoNoteRepository_DeleteByAuthor_Returns_ArgumentNullException()
+        {
+            bool catched = false;
+
+            try
+            {
+                var res = repo.DeleteByAuthor(null);
+            }
+            catch (ArgumentNullException ex)
+            {
+                catched = true;
+                Assert.True(ex is ArgumentNullException);
             }
 
             Assert.True(catched);

@@ -1,4 +1,5 @@
 ﻿using MongoDB.Bson;
+using MongoDB.Driver;
 using MyNotes.Domain;
 using MyNotes.Domain.Base;
 using MyNotes.Interfaces.Base.Repositories;
@@ -78,14 +79,75 @@ namespace MyNotes.DAL.MongoDB
             return item;
         }
 
+        /// <summary>Удаляет элемент из репозитория</summary>
+        /// <param name="item">Удаляемый элемент</param>
+        /// <returns>Удалённый элемент</returns>
+        /// <exception cref="ArgumentException">В случае если удаляемый элемент отсутствует в репозиторие</exception>
+        /// <exception cref="ArgumentNullException">В случае если удаляемый элемент - <b>null</b></exception>
         public T Delete(T item)
         {
-            _col.DeleteOne(new BsonDocument("_id", item.Id));
+            if(item is null) throw new ArgumentNullException("Item is null");
+            var res = _col.DeleteOne(new BsonDocument("_id", item.Id));
+            if (res.DeletedCount == 0)
+            {
+                throw new ArgumentException("Item not found");
+            }
             return item;
         }
-        public Task<IEnumerable<T>> DeleteByAuthorAsync(IUser Author, CancellationToken Cancel = default)
+
+        /// <summary>Асинхронно удаляет элементы с указанным автором из репозитория</summary>
+        /// <param name="Author">Автор удаляемых элементов</param>
+        /// <param name="Cancel">Токен отмены</param>
+        /// <returns>Перечесление удалённых элементов</returns>
+        /// <exception cref="AggregateException">В случае если в репозитории нет элементов с этим автором или переданный автор - <b>null</b></exception>
+        public async Task<IEnumerable<T>> DeleteByAuthorAsync(IUser Author, CancellationToken Cancel = default)
         {
-            throw new NotImplementedException();
+            var author = Author as User;
+            var filter = new BsonDocument();
+            var authorFilter = new BsonDocument();
+            authorFilter.AddRange(new BsonDocument("_t", author.GetType().Name));
+            authorFilter.AddRange(new BsonDocument("_id", author.Id));
+            authorFilter.AddRange(new BsonDocument("Name", author.Name));
+            filter.Add("Author", authorFilter);
+            List<T> res = new List<T>();
+            using (var cursor = await _col.FindAsync<T>(filter, null, Cancel))
+            {
+                while(await cursor.MoveNextAsync())
+                {
+                    var docs = cursor.Current;
+                    foreach(var doc in docs)
+                    {
+                        res.Add(doc);
+                    }
+                }
+            }
+            var del = await _col.DeleteManyAsync(filter, Cancel);
+            if (del.DeletedCount == 0) throw new ArgumentException("Items not found");
+            return res;
+        }
+
+        /// <summary>Удаляет элементы с указанным автором из репозитория</summary>
+        /// <param name="Author">Автор удаляемых элементов</param>
+        /// <returns>Перечесление удалённых элементов</returns>
+        /// <exception cref="ArgumentException">В случае если в репозитории нет элементов с этим автором</exception>
+        /// <exception cref="ArgumentNullException">В случае если переданный автор - <b>null</b></exception>
+        public IEnumerable<T> DeleteByAuthor(IUser Author)
+        {
+            if (Author is null) throw new ArgumentNullException("Author is null");
+            var author = Author as User;
+            var filter = new BsonDocument();
+            var authorFilter = new BsonDocument();
+            authorFilter.AddRange(new BsonDocument("_t", author.GetType().Name));
+            authorFilter.AddRange(new BsonDocument("_id", author.Id));
+            authorFilter.AddRange(new BsonDocument("Name", author.Name));
+            filter.Add("Author", authorFilter);
+            List<T> res;
+            var cursor = _col.Find(filter);
+            res = cursor.ToList();
+
+            var del = _col.DeleteMany(filter);
+            if (del.DeletedCount == 0) throw new ArgumentException("Items not found");
+            return res;
         }
 
         public Task<IEnumerable<T>> DeleteByBodyAsync(string Body, CancellationToken Cancel = default)
